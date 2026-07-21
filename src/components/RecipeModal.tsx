@@ -236,7 +236,7 @@ export default function RecipeModal({ recipe, isOpen, onClose }: RecipeModalProp
 
               {/* YouTube Link */}
               <motion.a
-                href={recipe.youtubeLink}
+                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${recipe.name} recipe ${recipe.state} Indian`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all group"
@@ -245,11 +245,11 @@ export default function RecipeModal({ recipe, isOpen, onClose }: RecipeModalProp
                 transition={{ delay: 0.55 }}
               >
                 <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <Play size={24} className="text-white" />
+                  <Play size={24} className="text-white fill-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-white">Watch on YouTube</p>
-                  <p className="text-xs text-red-300/70">See the full video recipe tutorial</p>
+                  <p className="text-sm font-semibold text-white">Watch "{recipe.name}" on YouTube</p>
+                  <p className="text-xs text-red-300/70">See real video tutorials from top Indian chefs</p>
                 </div>
                 <ExternalLink size={16} className="text-red-300/50 group-hover:text-red-300 transition-colors" />
               </motion.a>
