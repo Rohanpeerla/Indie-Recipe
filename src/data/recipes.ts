@@ -73,7 +73,7 @@ export const recipes: Recipe[] = [
       'Simmer for 5 more minutes. Finish with a dollop of butter on top.',
     ],
     chefTip: 'For restaurant-style richness, blend cashews into the tomato gravy and use a charcoal piece for smoky flavor (dhungar method).',
-    youtubeLink: 'https://www.youtube.com/watch?v=a03U45jFxOI',
+    youtubeLink: 'https://www.youtube.com/watch?v=b7yuoRk227Y',
     isVeg: false,
   },
   {
