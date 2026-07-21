@@ -1,8 +1,97 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Clock, Flame, MapPin, ChefHat, Leaf, Drumstick, ExternalLink, Play } from 'lucide-react';
+import { useState } from 'react';
+import { X, Clock, Flame, MapPin, ChefHat, Leaf, Drumstick, ExternalLink, Play, Copy, Check } from 'lucide-react';
 import type { Recipe } from '../data/recipes';
 import { regionColors } from '../data/recipes';
+
+function YouTubeLinks({ recipeName, recipeState }: { recipeName: string; recipeState: string }) {
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${recipeName} recipe ${recipeState}`)}`;
+  const googleVideoUrl = `https://www.google.com/search?q=${encodeURIComponent(`${recipeName} recipe video ${recipeState}`)}&tbm=vid`;
+
+  const handleCopy = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(null), 2000);
+    } catch {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try { document.execCommand('copy'); } catch { /* ignore */ }
+      document.body.removeChild(textArea);
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(null), 2000);
+    }
+  };
+
+  const handleOpen = (url: string) => {
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Popup was blocked — fall back to current tab
+      window.location.href = url;
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div
+        onClick={() => handleOpen(youtubeSearchUrl)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleOpen(youtubeSearchUrl); }}
+        className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all group cursor-pointer"
+      >
+        <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+          <Play size={24} className="text-white fill-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white">🔍 Search "{recipeName}" on YouTube</p>
+          <p className="text-xs text-red-300/70 truncate">{youtubeSearchUrl}</p>
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); handleCopy(youtubeSearchUrl); }}
+          className="flex-shrink-0 w-9 h-9 rounded-lg bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-colors"
+          title="Copy link"
+        >
+          {copiedUrl === youtubeSearchUrl ? <Check size={14} className="text-green-400" /> : <Copy size={14} className="text-red-300" />}
+        </button>
+        <ExternalLink size={16} className="text-red-300/50 group-hover:text-red-300 transition-colors flex-shrink-0" />
+      </div>
+
+      <div
+        onClick={() => handleOpen(googleVideoUrl)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleOpen(googleVideoUrl); }}
+        className="flex items-center gap-3 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-all group cursor-pointer"
+      >
+        <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+          <Play size={24} className="text-white fill-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white">🎬 Watch on Google Videos</p>
+          <p className="text-xs text-blue-300/70 truncate">Browse cooking videos from across the web</p>
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); handleCopy(googleVideoUrl); }}
+          className="flex-shrink-0 w-9 h-9 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 flex items-center justify-center transition-colors"
+          title="Copy link"
+        >
+          {copiedUrl === googleVideoUrl ? <Check size={14} className="text-green-400" /> : <Copy size={14} className="text-blue-300" />}
+        </button>
+        <ExternalLink size={16} className="text-blue-300/50 group-hover:text-blue-300 transition-colors flex-shrink-0" />
+      </div>
+
+      <p className="text-[10px] text-center text-[var(--text-secondary)]/60 pt-1">
+        💡 Tip: If a new tab doesn't open, use the copy button (📋) and paste in your browser
+      </p>
+    </div>
+  );
+}
 
 interface RecipeModalProps {
   recipe: Recipe | null;
@@ -234,25 +323,8 @@ export default function RecipeModal({ recipe, isOpen, onClose }: RecipeModalProp
                 </div>
               </motion.div>
 
-              {/* YouTube Link */}
-              <motion.a
-                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${recipe.name} recipe ${recipe.state} Indian`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all group"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.55 }}
-              >
-                <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <Play size={24} className="text-white fill-white" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-white">Watch "{recipe.name}" on YouTube</p>
-                  <p className="text-xs text-red-300/70">See real video tutorials from top Indian chefs</p>
-                </div>
-                <ExternalLink size={16} className="text-red-300/50 group-hover:text-red-300 transition-colors" />
-              </motion.a>
+              {/* YouTube Links */}
+              <YouTubeLinks recipeName={recipe.name} recipeState={recipe.state} />
             </div>
           </motion.div>
         </motion.div>
